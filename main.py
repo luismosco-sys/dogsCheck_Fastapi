@@ -48,12 +48,11 @@ def get_all_mascots(db:Session = Depends(get_db)):
     return db.query(Mascot).all()
 
 #Actualizar Registro
-@app.put("/users/{mascot_id}", response_model=MascotResponse)
-def update_user(mascot_id: int, mascot: MascotUpdate, db: Session = Depends(get_db)):
-    """Update a user"""
+@app.put("/mascot/{mascot_id}", response_model=MascotResponse)
+def update_mascot(mascot_id: int, mascot: MascotUpdate, db: Session = Depends(get_db)):
     db_mascot = db.query(Mascot).filter(Mascot.id == mascot_id).first()
     if not db_mascot:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Registro no encontrado")
     
     for field, value in mascot.dict().items():
         setattr(db_mascot, field, value)
