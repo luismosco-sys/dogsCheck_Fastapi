@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from api_schemas import MascotCreate, MascotResponse, MascotUpdate
 from db_setup import Mascot,get_db
 from typing import List
+from sqlalchemy.orm import Session
 
 
 app = FastAPI(title="Rescue Doggy Register")
@@ -12,13 +13,15 @@ app = FastAPI(title="Rescue Doggy Register")
 def root():
     return("Terminal messsage: System Working")
 
+#GET Registro especifico
 @app.get("/mascot/{mascot_id}", response_model=MascotResponse)
 def get_mascot(mascot_id:int, db:Session=Depends(get_db)):
     mascot = db.query(Mascot).filter(Mascot.id == mascot_id).first()
     if not mascot:
         raise HTTPException(status_code=404, detail="No se encuentra ese registro")
     return mascot
-    
+
+#POST Crear registro
 @app.post("/mascot", response_model=MascotResponse)
 def create_mascot(mascot:MascotCreate, db:Session = Depends(get_db)):
     #Crear nuevo registro
@@ -31,7 +34,7 @@ def create_mascot(mascot:MascotCreate, db:Session = Depends(get_db)):
     db.refresh(new_register)
     return new_register
 
-#Borrar Registro 
+#DELETE Borrar Registro 
 @app.delete("/mascot/{mascot_id}")
 def delete_mascot(mascot_id:int, db:Session =Depends(get_db)):
     mascot = db.query(Mascot).filter(Mascot.id == mascot_id).first()
@@ -42,12 +45,12 @@ def delete_mascot(mascot_id:int, db:Session =Depends(get_db)):
     db.commit()
     return{"message":"Registro eliminado"}
 
-#Obtener todos los registros 
+#GET Obtener todos los registros 
 @app.get("/mascot/", response_model=List[MascotResponse])
 def get_all_mascots(db:Session = Depends(get_db)):
     return db.query(Mascot).all()
 
-#Actualizar Registro
+#PUT Actualizar Registro
 @app.put("/mascot/{mascot_id}", response_model=MascotResponse)
 def update_mascot(mascot_id: int, mascot: MascotUpdate, db: Session = Depends(get_db)):
     db_mascot = db.query(Mascot).filter(Mascot.id == mascot_id).first()
